@@ -84,102 +84,6 @@ public class SnakesAndLadders {
 	public int flipDice() {
 		return (int)(6*Math.random()+1);
 	}
-		
-	/**
-	 * THIS METHOD IS INVOLVED WITH THE FIRST DRAFT ORDER
-	 * not needed anymore
-	  * This method counts the number of non-null positions in a given array of object Player.
-	  * @param an array of object Player who are playing the game
-	  * @return an integer value representing the number of non-null positions in the array.
-	*/
-	private int count(Player[] array) {
-	    int size = 0;
-	    for (Player el: array) { 
-	    	if(el != null) 
-	    		size++; 
-	    	}
-	        return size;
-	}
-	/**
-	 FIRST draft of the order players function BAD
-	*/
-	public void order(Player[] unordered) {
-		//Initialize the tied players array to null
-		Player[] tied = new Player[numPlayers];
-		
-		//Find the maximum rolled dice value of the players and assign it to the variable max.
-		int max = 0;
-		for (Player el: unordered) {
-			if (el != null && el.getDiceRoll() > max)
-				max = el.getDiceRoll();
-		}
-		
-		//Find if more than one player has rolled the max and add it to tied array. Set the added players to null in the original array.
-		for (int i=0; i<numPlayers; i++) {
-			if (unordered[i] != null && unordered[i].getDiceRoll() == max) {
-				int count = 0;
-				for (int j=0; j<numPlayers; j++) {
-					if(tied[j] == null && count < 1) {
-						tied[j] = unordered[i];
-						unordered[i] = null;
-						count+=1;
-					}
-				}
-			}
-		}
-		//Size of players in the tied array
-		int sizeTie = count(tied);
-		
-		//If there is only one player with max roll value, then there is no tie and we send that player into the ordered array
-		if (sizeTie == 1) {
-			int count1 = 0;
-			for (int i=0; i<numPlayers; i++) {
-				if (ordered[i] == null && count1 < 1) { 
-					ordered[i] = tied[0];
-					tied[0] = null;
-					count1+=1;
-				}	
-			}
-			if(count(unordered)>0)
-				order(unordered); 
-		}
-		//If there are more than one players with max roll value, there is a tie and we repeat the process
-		else {
-			System.out.print("A tie was achieved between ");
-			int count2 = 0;
-			for(Player el: tied) {
-				if (el != null) {
-					count2+=1;
-					System.out.print("Player "+ el.getName());
-					if(count2 != sizeTie)
-						System.out.print(" and ");
-				}
-			}
-			System.out.println("\nAttempting to break the tie: ");
-			
-			// roll the dice again for the tied players
-			while (count(tied) > 0) {
-				for (Player el: tied) {
-					if (el != null) {
-						el.setDiceRoll(flipDice());
-						System.out.println(el);
-					}
-				}
-				// Call the order method again for the tied players
-				order(tied);
-			}
-
-			//Check if there are any players left to be ordered
-			int sizeList = count(unordered);
-			
-			//if yes, we call the function again from the original list of players
-			if (sizeList>0) {
-				
-				order(unordered);
-			}
-			
-		}
-	}
 	
 	/**
 	 * This method determines the order the players will play the game. The method iterates through the array and checks how many players 
@@ -188,25 +92,24 @@ public class SnakesAndLadders {
 	 * If a tie did occur, the tied players be added into a new array and will run through this method again until they achieve distinct dice values. 
 	 * This method will be repeated called on until a final order is determined. 
 	 * @param an array of object Player.
-	 * @param start index (inclusive
+	 * @param start index (inclusive)
 	 * @param end index (exclusive)
 	*/
 	public void orderPlayers(Player[] players, int start, int end) {
-		// Get all players between players[start] (inclusive) and
-		// players[end] (exclusive) to roll the dice.
+		// Roll dice and display value for players between players[start] (inclusive) and
+		// players[end] (exclusive) 
 		for (int i = start; i < end; ++i) {
-		    // Roll dice and display dice value
 		    players[i].setDiceRoll(flipDice());
 		    System.out.println(players[i]);
 		}
-		// Sort this portion of the array according to the number rolled.
+		// Sort the array by descending order
 		Arrays.sort(players, start, end, new Comparator<Player>() {
 			public int compare(Player a, Player b) {
 				return Integer.compare(b.getDiceRoll(), a.getDiceRoll());
 			}
 		});
 
-		// Look for players who rolled the same number.
+		// Find tied players who rolled the same number
 		int i = start;
 		while (i < end) {
 		    // Try to find a "run" of players with the same number.
